@@ -150,7 +150,9 @@ public class DBStoreService implements StoreService {
 
     @Override
     public List<CarPhoto> getCarPhotos(Announcement announcement) {
-        return null;
+        return tx(session -> session.createQuery("select a.photos from models.Announcement a where a.id in :id")
+                .setParameter("id", announcement.getId()).list()
+        );
     }
 
     @Override
