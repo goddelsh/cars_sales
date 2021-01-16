@@ -1,5 +1,6 @@
 package services;
 
+import com.google.gson.internal.LinkedTreeMap;
 import models.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -7,10 +8,14 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.mapping.Collection;
 
-import java.util.ArrayList;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -135,6 +140,41 @@ public class DBStoreService implements StoreService {
         });
     }
 
+    @Override
+    public List<Announcement> getAnnouncements(User user, Map<Filters, Object> filters, int page) {
+        return tx(session -> {
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+            Root announcement = criteriaQuery.from(Announcement.class);
+            criteriaQuery.select(criteriaBuilder.construct(Announcement.class,
+                    announcement.get("id"), announcement.get("title"), announcement.get("description"),
+                    announcement.get("price"), announcement.get("createTime"), announcement.get("status")));
+            if (user != null) {
+                criteriaQuery.where(criteriaBuilder.equal(announcement.get("user"), user.getId()));
+            }
+            for (Map.Entry<Filters, Object> entry : filters.entrySet()) {
+                switch (entry.getKey()) {
+                    case NONE:
+                        break;
+                    case DAY:
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                        try {
+                            criteriaQuery.where(criteriaBuilder.equal(announcement.get("createTime"), df.parse((String)entry.getValue())));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case WITH_FOTO:
+                        criteriaQuery.where(criteriaBuilder.isNotEmpty(announcement.get("photos")));
+                        break;
+                    case MODEL:
+                        criteriaQuery.where(criteriaBuilder.equal(announcement.get("model"), new CarModel(Integer.parseInt(((LinkedTreeMap<String, String>) entry.getValue()).get("id")))));
+                        break;
+                }
+            }
+            return session.createQuery(criteriaQuery).setFirstResult((page - 1) * 20).setMaxResults(20).list();
+        });
+    }
 
     @Override
     public Announcement getFullAnnouncements(Announcement announcement) {

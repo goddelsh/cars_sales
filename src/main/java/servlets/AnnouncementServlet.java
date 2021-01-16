@@ -1,9 +1,7 @@
 package servlets;
 
 import com.google.gson.Gson;
-import models.Announcement;
-import models.User;
-import models.Wrapper;
+import models.*;
 import org.apache.commons.io.IOUtils;
 import services.AnnouncementService;
 import services.AnnouncementServiceImpl;
@@ -16,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +41,14 @@ public class AnnouncementServlet extends HttpServlet {
         switch (parsedRequest.getAction()) {
             case GET_ANNOUNCEMENTS:
                 responseWrapper.setAnnouncements(DBStoreService.getStoreService().getAnnouncements(null, parsedRequest.getPage()));
+                responseWrapper.setStatus("OK");
+                break;
+            case GET_FILTERED_ANNOUNCEMENTS:
+                try {
+                    responseWrapper.setAnnouncements(DBStoreService.getStoreService().getAnnouncements(parsedRequest.isMy() ? user : null, parsedRequest.getFilters(), parsedRequest.getPage()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 responseWrapper.setStatus("OK");
                 break;
             case GET_MYANNOUNCEMENTS:

@@ -2,7 +2,9 @@ package services;
 
 import models.*;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 public interface StoreService {
 
@@ -14,6 +16,7 @@ public interface StoreService {
 
     List<SellerContact> getSellerContact(User user);
     List<Announcement> getAnnouncements(User user, int page);
+    List<Announcement> getAnnouncements(User user, Map<Filters, Object> filters, int page) throws ParseException;
     Announcement getFullAnnouncements(Announcement announcement);
     List<CarPhoto> getCarPhotos(Announcement announcement);
     List<CarPhoto> getCarPhotos(List<CarPhoto> carPhotos);

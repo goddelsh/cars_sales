@@ -17,6 +17,10 @@ public class CarModel {
         this.name = name;
     }
 
+    public CarModel(Integer id) {
+        this.id = id;
+    }
+
     public Integer getId() {
         return id;
     }

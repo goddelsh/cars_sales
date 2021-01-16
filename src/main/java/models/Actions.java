@@ -2,6 +2,7 @@ package models;
 
 public enum Actions {
     GET_ANNOUNCEMENTS,
+    GET_FILTERED_ANNOUNCEMENTS,
     GET_MYANNOUNCEMENTS,
     GET_ANNOUNCEMENT,
     GET_CARTYPES,

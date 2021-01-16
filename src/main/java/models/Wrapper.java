@@ -1,13 +1,16 @@
 package models;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Wrapper {
 
     private Actions action;
+    private Map<Filters, Object> filters = new HashMap<>();
     private int page = 1;
     private int pages = 10;
-    private String filter;
+    private boolean my;
     private List<Announcement> announcements;
     private List<CarBody> carBodies;
     private List<CarBrand> carBrands;
@@ -26,13 +29,6 @@ public class Wrapper {
         this.action = action;
     }
 
-    public String getFilter() {
-        return filter;
-    }
-
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
 
     public List<Announcement> getAnnouncements() {
         return announcements;
@@ -122,4 +118,19 @@ public class Wrapper {
         this.pages = pages;
     }
 
+    public Map<Filters, Object> getFilters() {
+        return filters;
+    }
+
+    public void setFilters(Map<Filters, Object> filters) {
+        this.filters = filters;
+    }
+
+    public boolean isMy() {
+        return my;
+    }
+
+    public void setMy(boolean my) {
+        this.my = my;
+    }
 }

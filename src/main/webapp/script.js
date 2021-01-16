@@ -14,7 +14,9 @@ function getAllMy(){
     getAnnouncments(page);
 }
 
-
+function chng(){
+    getAnnouncments(page);
+}
 
 function createAnnouncment() {
     let announcment = {
@@ -86,14 +88,40 @@ function getAnnouncments(page) {
     if (all != 0) {
         action = "GET_MYANNOUNCEMENTS";
     }
-    let req = JSON.stringify({
+    let req = {
         "page" : page,
-        "action" : action
-    });
+        "action" : "GET_FILTERED_ANNOUNCEMENTS"
+    };
+    if (all != 0) {
+        req["my"] = true;
+    } else {
+        req["my"] = false;
+    }
+    let filters = {};
+    let modelFilter = $('#carModelSelect').val();
+    if (modelFilter > 0) {
+        filters["MODEL"] = {
+            id: modelFilter
+        };
+    }
+
+    if ($('#withPhoto').is(":checked")) {
+        filters["WITH_FOTO"] = {};
+    }
+
+    if ($('#lastDay').is(":checked")) {
+        var start = new Date();
+        start.setHours(0,0,0,0);
+        filters["DAY"] = start;
+    }
+
+    req["filters"] = filters;
+
+    let reqString = JSON.stringify(req);
     $.ajax({
         type: 'POST',
         url: "http://localhost:8686/cars_sales_war/announcement.do",
-        data: req,
+        data: reqString,
         dataType: 'json'
     }).done(function(data) {
         $('#itemsList').empty();
